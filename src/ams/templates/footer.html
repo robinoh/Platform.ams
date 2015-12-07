@@ -1,0 +1,124 @@
+		</div>
+	</div>
+</div>
+
+<!-- Start My Setting Modal -->
+<div id="MySettingModal" class="modal fade" data-bind="with: mySetting">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title"><i class="fa fa-unlock"></i> <?=$this->Lang->load('title,settings')?></h4>
+			</div>
+			<div class="modal-body">
+				<div class="alert alert-danger" data-bind="visible: error.visible()">
+					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+					<h4><?=$this->Lang->load('title,error')?></h4>
+					<p data-bind="html: error.text()"></p>
+				</div>
+				<div class="form-horizontal">
+					<div class="form-group">
+						<label class="col-sm-4 control-label"><i class="fa fa-fw fa-globe"></i> <?=$this->Lang->load('label,language')?></label>
+						<div class="col-sm-8 select2-sm selectLanguage">
+							<select class="select2me" style="width: 100%;" data-bind="value: language, optionsText: 'name', optionsValue: 'code', options: window.language, event: { change: function(){ setLanguage(); } }"></select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-4 control-label"><i class="fa fa-fw fa-clock-o"></i> <?=$this->Lang->load('label,timezone')?></label>
+						<div class="col-sm-8 select2-sm selectTimezone">
+							<select class="select2me" style="width: 100%;" data-bind="value: timezone, optionsText: 'code', optionsValue: 'timezone', options: window.timezone, event: { change: function(){ setTimezone(); } }"></select>
+						</div>
+					</div>
+				</div>
+				<div class="form-horizontal margin-top-15">
+					<div class="form-group">
+						<label class="col-sm-4 control-label"><i class="fa fa-fw fa-lock"></i> <?=$this->Lang->load('label,password')?></label>
+						<div class="col-sm-5"></div>
+						<div class="col-sm-3" data-bind="visible: !changePasswordVisible()"><button type="button" class="btn btn-flat btn-sm btn-block btn-info no-margin-left" data-bind="click: function(){ changePasswordVisible(true); currentPassword(''); password(''); confirmPassword(''); }"><i class="fa fa-edit"></i> <?=$this->Lang->load("buttons,change")?></button></div>
+					</div>
+					<div class="form-group" data-bind="css: currentPassword.ErrorClass(), visible: changePasswordVisible()">
+						<label class="col-sm-4 control-label"><i class="fa fa-fw"></i> <?=$this->Lang->load('columns,currentPassword')?></label>
+						<div class="col-sm-8">
+							<input type="password" class="form-control input-sm" maxlength="20" data-bind="textInput: currentPassword">
+							<span class="help-block" data-bind="visible: currentPassword.Status(), text: currentPassword.Message()"></span>
+						</div>
+					</div>
+					<div class="form-group" data-bind="css: password.ErrorClass(), visible: changePasswordVisible()">
+						<label class="col-sm-4 control-label"><i class="fa fa-fw"></i> <?=$this->Lang->load('columns,newPassword')?></label>
+						<div class="col-sm-8">
+							<input type="password" class="form-control input-sm" maxlength="20" data-bind="textInput: password">
+							<span class="help-block" data-bind="visible: password.Status(), text: password.Message()"></span>
+						</div>
+					</div>
+					<div class="form-group" data-bind="css: confirmPasswordClass(), visible: changePasswordVisible()">
+						<label class="col-sm-4 control-label"><i class="fa fa-fw"></i> <?=$this->Lang->load('columns,confirmPassword')?></label>
+						<div class="col-sm-8">
+							<input type="password" class="form-control input-sm" maxlength="20" data-bind="textInput: confirmPassword">
+							<span class="help-block" data-bind="visible: confirmPasswordHasError(), text: confirmPasswordMessage()"></span>
+						</div>
+					</div>
+					<div class="form-group" data-bind="visible: changePasswordVisible()">
+						<div class="col-sm-12 text-right">
+							<button type="button" class="btn btn-sm btn-flat btn-default" data-bind="click: function(){ changePasswordVisible(false); }">
+								<i class="fa" data-bind="css: button.classLoading('fa-times')"></i>
+								<?=$this->Lang->load('buttons,cancel')?>
+							</button>
+							<button type="button" class="btn btn-sm btn-flat btn-primary" data-bind="css: submitDisabled(), click: function(){ updateInfo(); }">
+								<i class="fa" data-bind="css: button.classLoading('fa-save')"></i>
+								<?=$this->Lang->load('buttons,apply')?>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="form-horizontal margin-top-15">
+					<div class="form-group" data-bind="css: emailAddress.ErrorClass()">
+						<label class="col-sm-4 control-label"><i class="fa fa-fw fa-envelope"></i> <?=$this->Lang->load('label,email')?></label>
+						<div class="col-sm-5 form-control-static" data-bind="html: prevEmailAddress(), visible: !changeEmailVisible()"></div>
+						<div class="col-sm-3 text-right" data-bind="visible: !changeEmailVisible()"><button type="button" class="btn btn-flat btn-sm btn-block btn-info no-margin-left" data-bind="click: function(){ changeEmailVisible(true); }"><i class="fa fa-edit"></i> <?=$this->Lang->load("buttons,change")?></button></div>
+						<div class="col-sm-8" data-bind="visible: changeEmailVisible()">
+							<input type="text" class="form-control input-sm" data-bind="textInput: emailAddress">
+							<span class="help-block" data-bind="visible: emailAddress.Status(), text: emailAddress.Message()"></span>
+						</div>
+					</div>
+					<div class="form-group" data-bind="visible: changeEmailVisible()">
+						<div class="col-sm-12 text-right">
+							<button type="button" class="btn btn-sm btn-flat btn-default" data-bind="click: function(){ changeEmailVisible(false); emailAddress(prevEmailAddress()); }">
+								<i class="fa" data-bind="css: button.classLoading('fa-times')"></i>
+								<?=$this->Lang->load('buttons,cancel')?>
+							</button>
+							<button type="button" class="btn btn-sm btn-flat btn-primary" data-bind="css: submitDisabled2(), click: function(){ updateEmail(); }">
+								<i class="fa" data-bind="css: button.classLoading('fa-save')"></i>
+								<?=$this->Lang->load('buttons,apply')?>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-sm btn-flat btn-default" data-dismiss="modal" data-bind="css: button.classDisabled()">
+					<i class="fa fa-times"></i>
+					<?=$this->Lang->load('buttons,close')?>
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- BEGIN JAVASCRIPTS(Load javascripts at bottom, this will reduce page load time) -->
+<!--[if lt IE 9]>
+<script src="/static/js/_html5/respond.min.js"></script>
+<script src="/static/js/_html5/excanvas.min.js"></script>
+<![endif]-->
+
+<!-- js files loading -->
+<?=$js?>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	//initialize the javascript
+	App.init();
+});
+</script>
+
+</body>
+</html>

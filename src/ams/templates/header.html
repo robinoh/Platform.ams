@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+
+<head>
+	<meta charset="utf-8"/>
+	<title><?=$siteTitle?></title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+
+	<?=$urls['favicon']?>
+
+	<!-- string table load -->
+	<script type="text/javascript" src="/_preset/locale/<?=$userLang?>"></script>
+	<?=$css?>
+
+	<script>
+		<?if(ENVIRONMENT != 'live'){?>window.environment = <?=json_encode(ENVIRONMENT)?>;<?}?>
+		window.provider = <?=json_encode(PROVIDER)?>;
+		window.supportEmail = <?=json_encode($supportEmail)?>;
+		window.userData = <?=json_encode($userData)?>;
+		window.DTPreset = <?=json_encode($DT)?>;
+	</script>
+
+	<!-- js files loading -->
+	<script type="text/javascript" src="/static/js/_jquery/jquery.js"></script>
+	<script type="text/javascript" src="/static/js/_jquery/knockout.js"></script>
+	<script type="text/javascript" src="/static/js/Modules/ko.daterange.js"></script>
+</head>
+
+<body>
+
+<!-- Fixed navbar -->
+<div id="head-nav" class="navbar navbar-default">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+				<span class="fa fa-bars"></span>
+			</button>
+			<a class="navbar-brand navbar-logo" href="#"><?=$urls['logo']?></a>
+		</div>
+		<div class="navbar-collapse collapse navbar-menus">
+			<ul class="nav navbar-nav navbar-right user-nav">
+				<li class="dropdown profile_menu">
+					<?if(!$urls['hideNav']){?>
+					<a href="#" class="dropdown-toggle navbar-header" data-toggle="dropdown"><?=$this->Lang->load('string,welcome')?>, <strong><?=$userData['username']?></strong> (<?=str_replace('GMT', 'UTC', $userData['timezone'])?>)<b class="caret"></b></a>
+					<ul class="dropdown-menu">
+						<li><a data-bind="click: function(){ mySetting.editInfo(); }"><i class="fa fa-fw fa-cog"></i> <?=$this->Lang->load('label,settings')?></a></li>
+						<li><a data-bind="click: function(){ logout(); }" data-toggle="dropdown"><i class="fa fa-fw fa-power-off"></i> <?=$this->Lang->load('string,logout')?></a></li>
+					</ul>
+					<?}else{?>
+					<span class="dropdown-toggle navbar-header" style="cursor: default;"><?=$this->Lang->load('string,welcome')?>, <strong><?=$userData['username']?></strong> (<?=str_replace('GMT', 'UTC', $userData['timezone'])?>)</span>
+					<?}?>
+				</li>
+			</ul>
+			<?if(!$urls['hideNav']){?>
+			<ul class="nav navbar-nav navbar-font">
+				<!-- My Info -->
+				<li data-bind="css: nav.css(['MyInfo'])">
+					<a href="/MyInfo"><i class="fa fa-home"></i> <?=$this->Lang->load('nav,MyInfo')?></a>
+				</li>
+
+				<!-- Poker Statistics -->
+				<li data-bind="css: nav.css(['PokerStatistics'])">
+					<a href="/PokerStatistics"><i class="fa fa-bar-chart"></i> <?=$this->Lang->load('nav,PokerStatistics')?></a>
+				</li>
+
+				<!-- Casino Statistics -->
+				<li data-bind="css: nav.css(['CasinoStatistics'])">
+					<a href="/CasinoStatistics"><i class="fa fa-area-chart"></i> <?=$this->Lang->load('nav,CasinoStatistics')?></a>
+				</li>
+
+				<!-- Agents -->
+				<li data-bind="css: nav.css(['Agents'])">
+					<a href="/Agents"><i class="fa fa-sitemap"></i> <?=$this->Lang->load('nav,Agents')?></a>
+				</li>
+
+				<!-- Players -->
+				<li data-bind="css: nav.css(['Players', 'PlayersWalletHistory'])">
+					<a href="/Players"><i class="fa fa-users"></i> <?=$this->Lang->load('nav,Players')?></a>
+				</li>
+
+				<!-- Banners -->
+				<li data-bind="css: nav.css(['Banners'])">
+					<a href="/Banners"><i class="fa fa-file-image-o"></i> <?=$this->Lang->load('nav,Banners')?></a>
+				</li>
+
+				<!-- Tracking Link -->
+				<?if($userData['tier'] > 0){?>
+				<li data-bind="css: nav.css(['BonusCodeTools'])">
+					<a href="/BonusCodeTools"><i class="fa fa-wrench"></i> <?=$this->Lang->load('nav,BonusCodeTools')?></a>
+				</li>
+				<?}?>
+			</ul>
+			<?}?>
+		</div>
+	</div>
+</div>
+
+<div id="cl-wrapper">
+	<div class="page-head">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-lg-12">
+					<span class="pull-right" data-bind="stopBindings: false">
+					</span>
+					<h3 class="pull-left">
+						<?=$urls['pageTitle']?>
+						<?if($urls['nowPage'] == 'MyInfo'){?>
+							<span class="page-title-info text-info"><?=$this->Lang->load('string,settlementUTC8comment')?></span>
+						<?}?>
+					</h3>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="container-fluid">
+		<div class="cl-mcont">

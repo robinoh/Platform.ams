@@ -1,0 +1,66 @@
+<div data-bind="stopBindings: false">
+	<div id="CasinoStatistics">
+		<div class="block-flat">
+			<div class="header">
+				<div class="search-box">
+					<div class="search-params">
+						<div class="form-inline">
+							<date-range params="dateFrom: dateFrom, dateTo: dateTo, selectedRange: 0, excludeRange: [0]"></date-range>
+							<div class="input-group input-medium" data-bind="visible: usernameOrNicknameUse()">
+								<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
+								<input type="text" class="form-control" placeholder="<?=$this->Lang->load('placeholder,usernameNickname')?>" data-bind="textInput: usernameOrNickname">
+							</div>
+							<div class="agentSearch"></div>
+						</div>
+						<div class="form-inline">
+							<div class="btn-group btn-checkbox">
+								<button type="button" class="btn btn-flat btn-default" data-bind="css: groupClass('player'), click: function(){ switchGroup('player'); }">
+									<i class="fa"></i>
+									<?=$this->Lang->load('buttons,perPlayer')?>
+								</button>
+								<button type="button" class="btn btn-flat btn-default" data-bind="css: groupClass('agent'), click: function(){ switchGroup('agent'); }">
+									<i class="fa"></i>
+									<?=$this->Lang->load('buttons,perAgent')?>
+								</button>
+							</div>
+							<div class="btn-group btn-checkbox">
+								<button type="button" class="btn btn-flat btn-default" data-bind="css: groupClass('day'), click: function(){ switchGroup('day'); }">
+									<i class="fa"></i>
+									<?=$this->Lang->load('buttons,perDay')?>
+								</button>
+								<button type="button" class="btn btn-flat btn-default" data-bind="css: groupClass('week'), click: function(){ switchGroup('week'); }">
+									<i class="fa"></i>
+									<?=$this->Lang->load('buttons,perWeek')?>
+								</button>
+								<button type="button" class="btn btn-flat btn-default" data-bind="css: groupClass('month'), click: function(){ switchGroup('month'); }">
+									<i class="fa"></i>
+									<?=$this->Lang->load('buttons,perMonth')?>
+								</button>
+							</div>
+						</div>
+					</div>
+					<div class="search-buttons">
+						<div class="search-button">
+							<button type="button" class="btn btn-flat btn-success btn-block btn2row" data-bind="click: function(){ loadReset(); }, css: DT.button.classDisabled()">
+								<i class="fa" data-bind="css: DT.button.classLoading('fa-search')"></i>
+								<?=$this->Lang->load('buttons,search')?>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="content">
+				<div class="datatable-setting"></div>
+				<div data-bind="css: DT.isVisible() ? '' : 'table-scrollable'">
+					<table class="table-bordered dataTable" data-bind="DataTable: dtPreset()">
+						<thead></thead>
+						<tbody></tbody>
+						<tfoot></tfoot>
+					</table>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>

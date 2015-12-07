@@ -1,0 +1,364 @@
+<div data-bind="stopBindings: false">
+	<div id="Agents">
+		<div class="block-flat">
+			<div class="header header-single">
+				<div class="search-box">
+					<div class="btn-group btn-checkbox pull-left" data-bind="css: showSuspended.css()">
+						<button type="button" class="btn btn-flat btn-info" data-bind="css: showSuspended.css(), click: function(){ showSuspendedLoad(); }">
+							<i class="fa" data-bind="css: button.classLoading(showSuspended.cssCheck())"></i>
+							<span><?=$this->Lang->load('buttons,showSuspended')?></span>
+						</button>
+					</div>
+					<div class="btn-group pull-right" data-bind="visible: window.userData['tier'] < 3">
+						<button class="btn btn-flat btn-success" data-bind="click: function(){ create(); }, css: button.classDisabled()">
+							<i class="fa" data-bind="css: button.classLoading('fa-plus')"></i>
+							<span><?=$this->Lang->load('buttons,createAgent')?></span>
+						</button>
+					</div>
+				</div>
+			</div>
+			<div class="content apply-loading">
+				<div class="table-scrollable">
+					<table class="table-bordered dataTable table-agent">
+						<thead>
+						<tr>
+							<th colspan="2"><?=$this->Lang->load('columns,agentCode')?></th>
+							<th><?=$this->Lang->load('columns,commissionPercentage')?></th>
+							<th><?=$this->Lang->load('columns,rakebackPercentage')?></th>
+							<th><?=$this->Lang->load('columns,balance')?></th>
+							<th><?=$this->Lang->load('columns,players')?></th>
+							<th><?=$this->Lang->load('columns,personalInfoAccess')?></th>
+							<th><?=$this->Lang->load('columns,balanceAccess')?></th>
+							<th><?=$this->Lang->load('columns,email')?></th>
+							<th><?=$this->Lang->load('string,edit')?></th>
+						</tr>
+						</thead>
+						<tbody data-bind="foreach: agents">
+						<tr data-bind="with: display, visible: $root.visibleSub($data, $element), css: $root.visibleSub($data, $element) ? 'shown': ''">
+							<td class="td-collapse" data-bind="css: depth > 0 && hasChild ? 'pointer':'', click: depth > 0 && hasChild ? function(){ $root.toggleSub(index);}: function(){}"><i class="fa fa-plus-square-o text-success" data-bind="visible: depth > 0 && hasChild"></i></td>
+							<td data-bind="style: {paddingLeft: paddingLeft}">
+								<div class="dropdown" data-bind="visible: editable && !preparing">
+									<a class="dropdown-toggle" data-toggle="dropdown" data-bind="css: suspended ? 'suspended' : ''"><u data-bind="html: name"></u></a>
+									<ul class="dropdown-menu">
+										<li data-bind="click: function(){ $root.transfer($parent); }">
+											<a>
+												<i class="fa fa-fw fa-dollar"></i>
+												<?=$this->Lang->load('string,creditDebit')?>
+											</a>
+										</li>
+									</ul>
+								</div>
+								<span data-bind="html: name, css: suspended ? 'suspended' : '', visible: !editable"></span>
+								<span class="text-muted-more" data-bind="visible: preparing">
+									<span data-bind="html: window.lang['string']['newAgent']"></span>
+								</span>
+							</td>
+							<td class="text-center" data-bind="html: commission"></td>
+							<td class="text-center" data-bind="html: rakeback"></td>
+							<td class="text-right" data-bind="html: balance"></td>
+							<td class="text-right" data-bind="html: playerCount"></td>
+							<td class="text-center" data-bind="html: hasPersonalInfoAccess"></td>
+							<td class="text-center" data-bind="html: hasBalanceAccess"></td>
+							<td data-bind="text: emailAddress"></td>
+							<td class="min-width nowrap" style="width: 280px;">
+								<!--<div class="btn-group nowrap no-margin-bottom">-->
+									<!--<button class="btn btn-danger btn-sm no-margin-bottom" data-bind="visible: editable, click: function(){ $root.edit($parent); }">
+										<i class="fa fa-fw fa-edit"></i> <?=$this->Lang->load('buttons,edit')?>
+									</button>-->
+								<!--</div>-->
+								<button class="btn btn-flat btn-danger btn-sm no-margin-bottom btn-flat" style="width: 67px;" data-bind="visible: editable, click: function(){ $root.edit($parent); }">
+									<i class="fa fa-fw fa-edit"></i> <?=$this->Lang->load('buttons,edit')?>
+								</button>
+								<button class="btn btn-flat btn-info btn-sm no-margin-bottom btn-flat" data-bind="visible: preparing, click: function(){ $root.resendEmail($parent); }">
+									<i class="fa fa-fw fa-send"></i> <?=$this->Lang->load('buttons,resendEmail')?>
+								</button>
+								<button class="btn btn-flat btn-warning btn-sm no-margin-bottom btn-flat" style="width: 67px;" data-bind="visible: editable, click: function(){ $root.memo($parent); }">
+									<i class="fa fa-fw fa-check" data-bind="visible: $parent.memoExists"></i> <?=$this->Lang->load('buttons,memo')?>
+								</button>
+							</td>
+						</tr>
+						</tbody>
+						</tbody>
+					</table>
+				</div>
+				<div class="apply-loading-box" data-bind="visible: loading.emptyVisible()"></div>
+				<div class="apply-loading-box-content" data-bind="visible: loading.emptyVisible(), html: loading.emptyText()"></div>
+			</div>
+		</div>
+
+		<div id="AgentsModal" class="modal fade" data-bind="with: modalCtrl">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" data-bind="html: title()"></h4>
+					</div>
+					<div class="modal-body">
+						<div class="alert alert-danger" data-bind="visible: error.visible()">
+							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+							<h4><?=$this->Lang->load('title,error')?></h4>
+							<p data-bind="html: error.text()"></p>
+						</div>
+
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<strong><?=$this->Lang->load('title,hierarchy')?></strong>
+							</div>
+							<div class="panel-body">
+								<div class="form-horizontal">
+									<div class="form-group" data-bind="visible: mode() == 'create'">
+										<label class="col-sm-4 control-label"><?=$this->Lang->load('label,parentAgent')?></label>
+										<div class="col-sm-8">
+											<div id="selectAgent" class="entity-selector select2"></div>
+										</div>
+									</div>
+									<div class="form-group" data-bind="visible: mode() == 'create'">
+										<label class="col-sm-4 control-label"><?=$this->Lang->load('label,agentType')?></label>
+										<div class="col-sm-8">
+											<div class="form-control-static radio-group" data-bind="visible: ableChooseAgentType()">
+												<label class="radio-inline" data-bind="click: function(){ changeAgentType('NonRakeback'); }">
+													<i class="fa" data-bind="css: typeClass('NonRakeback', agentType())"></i>
+													<?=$this->Lang->load('label,nonRakeback')?>
+												</label>
+												<label class="radio-inline" data-bind="click: function(){ changeAgentType('Rakeback'); }">
+													<i class="fa" data-bind="css: typeClass('Rakeback', agentType())"></i>
+													<?=$this->Lang->load('label,rakeback')?>
+												</label>
+											</div>
+											<div class="form-control-static" data-bind="visible: !ableChooseAgentType(), html: agentTypeText()"></div>
+										</div>
+									</div>
+									<div class="form-group" data-bind="visible: mode() == 'edit'">
+										<label class="col-sm-4 control-label"><?=$this->Lang->load('label,agentCode')?></label>
+										<div class="col-sm-8 form-control-static"><strong data-bind="html: agentCode()"></strong></div>
+									</div>
+									<div class="form-group" data-bind="css: commission.ErrorClass()">
+										<label class="col-sm-4 control-label"><?=$this->Lang->load('label,commissionPercentage')?></label>
+										<div class="col-sm-8">
+											<input type="text" class="form-control" data-bind="textInput: commission, attr: { placeholder :commissionPlaceholder() }, event: {blur: function(){ rakebackCheck(); }}">
+											<span class="help-block" data-bind="visible: commission.Status(), text: commission.Message()"></span>
+										</div>
+									</div>
+									<div class="form-group" data-bind="css: rakeback.ErrorClass(), visible: agentType() == 'Rakeback'">
+										<label class="col-sm-4 control-label"><?=$this->Lang->load('label,rakebackPercentage')?></label>
+										<div class="col-sm-8">
+											<input type="text" class="form-control" data-bind="textInput: rakeback, attr: { placeholder :rakebackPlaceholder() }">
+											<span class="help-block" data-bind="visible: rakeback.Status(), text: rakeback.Message()"></span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<strong><?=$this->Lang->load('title,access')?></strong>
+							</div>
+							<div class="panel-body">
+								<div class="form-horizontal">
+									<div class="form-group">
+										<label class="col-sm-4 control-label"><?=$this->Lang->load('label,personalInfoAccess')?></label>
+										<div class="col-sm-8">
+											<div class="form-control-static radio-group">
+												<label class="radio-inline" data-bind="click: function(){ personalInfoAccess(true); }">
+													<i class="fa" data-bind="css: typeClass(true, personalInfoAccess())"></i>
+													<?=$this->Lang->load('string,yes')?>
+												</label>
+												<label class="radio-inline" data-bind="click: function(){ personalInfoAccess(false); }">
+													<i class="fa" data-bind="css: typeClass(false, personalInfoAccess())"></i>
+													<span class="text-danger"><?=$this->Lang->load('string,no')?></span>
+												</label>
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-4 control-label"><?=$this->Lang->load('label,balanceAccess')?></label>
+										<div class="col-sm-8">
+											<div class="form-control-static radio-group">
+												<label class="radio-inline" data-bind="click: function(){ balanceAccess(true); }">
+													<i class="fa" data-bind="css: typeClass(true, balanceAccess())"></i>
+													<?=$this->Lang->load('string,yes')?>
+												</label>
+												<label class="radio-inline" data-bind="click: function(){ balanceAccess(false); }">
+													<i class="fa" data-bind="css: typeClass(false, balanceAccess())"></i>
+													<span class="text-danger"><?=$this->Lang->load('string,no')?></span>
+												</label>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="panel panel-default" data-bind="visible: mode() == 'create' || (mode() == 'edit' && preparing())">
+							<div class="panel-heading">
+								<strong><?=$this->Lang->load('title,defaultLanguage')?></strong>
+							</div>
+							<div class="panel-body">
+								<div class="form-horizontal">
+									<div class="form-group">
+										<label class="col-sm-4 control-label"><?=$this->Lang->load('label,language')?></label>
+										<div class="col-sm-8">
+											<select class="langSelect2" data-bind="value: language, optionsText: 'name', optionsValue: 'code', options: window.language" style="display: block;"></select>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="panel panel-default" data-bind="visible: mode() == 'create' || (mode() == 'edit' && preparing())">
+							<div class="panel-heading">
+								<strong><?=$this->Lang->load('title,invitationEmailAddress')?></strong>
+							</div>
+							<div class="panel-body">
+								<div class="form-horizontal">
+									<div class="form-group" data-bind="css: emailAddress.ErrorClass()">
+										<label class="col-sm-4 control-label"><?=$this->Lang->load('label,email')?></label>
+										<div class="col-sm-8">
+											<div>
+												<input type="text" class="form-control input-sm" data-bind="textInput: emailAddress">
+											</div>
+											<span class="help-block" data-bind="visible: emailAddress.Status(), text: emailAddress.Message()"></span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="panel panel-default" data-bind="visible: mode() == 'edit' && !preparing()">
+							<div class="panel-heading">
+								<strong><?=$this->Lang->load('title,status')?></strong>
+							</div>
+							<div class="panel-body">
+								<div class="form-horizontal">
+									<div class="form-group">
+										<label class="col-sm-4 control-label"><?=$this->Lang->load('label,status')?></label>
+										<div class="col-sm-8">
+											<div class="form-control-static radio-group">
+												<label class="radio-inline" data-bind="click: function(){ suspended(false); }">
+													<i class="fa" data-bind="css: typeClass(false, suspended())"></i>
+													<?=$this->Lang->load('string,active')?>
+												</label>
+												<label class="radio-inline" data-bind="click: function(){ suspended(true); }">
+													<i class="fa" data-bind="css: typeClass(true, suspended())"></i>
+													<?=$this->Lang->load('string,suspended')?>
+												</label>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-flat btn-primary" data-bind="css: submitDisabled(), click: function(){ save(); }">
+							<i class="fa" data-bind="css: button.classLoading('fa-save')"></i>
+							<?=$this->Lang->load('buttons,confirm')?>
+						</button>
+						<button type="button" class="btn btn-flat btn-default" data-dismiss="modal" data-bind="css: button.classDisabled()">
+							<i class="fa" data-bind="css: button.classLoading('fa-times')"></i>
+							<?=$this->Lang->load('buttons,close')?>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Agent Transfer Modal -->
+		<div id="AgentsTransfer" class="modal fade" data-bind="with: modalTransfer">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title"><?=$this->Lang->load('title,creditDebit')?></h4>
+					</div>
+					<div class="modal-body">
+						<div class="form-horizontal">
+							<div class="form-group no-margin-top no-margin-bottom">
+								<label class="col-sm-3 control-label"><h5 class="no-margin-top no-margin-bottom"><strong><?=$this->Lang->load('label,myBalance')?></strong></h5></label>
+								<div class="col-sm-9 form-control-static">
+									<h5 class="no-margin-top no-margin-bottom" data-bind="visible: !loading.emptyVisible()">
+										<span data-bind="html: dataFormat(myBalance(), 'money')"></span>
+										<span data-bind="visible: status() != 'input', html: amountDp()"></span>
+									</h5>
+									<h5 class="no-margin-top no-margin-bottom" data-bind="visible: loading.emptyVisible(), html: loading.emptyText()"></h5>
+								</div>
+							</div><hr class="margin-top-10 no-margin-bottom">
+							<div class="form-group">
+								<label class="col-sm-3 control-label"><span class="margin-left-10"><?=$this->Lang->load('label,agent')?></span></label>
+								<div class="col-sm-9 form-control-static" data-bind="html: data().name">
+								</div>
+							</div>
+							<div class="form-group" data-bind="visible: status() == 'input'">
+								<label class="col-sm-3 control-label"><span class="margin-left-10" data-bind="html: modeString()"></span></label>
+								<div class="col-sm-9" data-bind="css: amount.ErrorClass()">
+									<div class="input-group">
+										<span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+										<input type="text" class="form-control" data-bind="textInput: amount">
+									</div>
+									<span class="help-block" data-bind="html: amount.Message(), visible: amount.Status()"></span>
+								</div>
+							</div>
+							<div class="form-group" data-bind="visible: status() != 'input'">
+								<label class="col-sm-3 control-label"><span class="margin-left-10" data-bind="html: modeString(), css: mode() == 'credit' ? 'text-success': 'text-danger'"></span></label>
+								<strong class="col-sm-9 form-control-static" data-bind="html: dataFormat(amount(), 'money'), css: mode() == 'credit' ? 'text-success': 'text-danger'"></strong>
+							</div>
+							<div class="form-group" data-bind="visible: status() == 'result' && resultMessage()">
+								<label class="col-sm-3 control-label"><span class="margin-left-10"><?=$this->Lang->load('label,status')?></span></label>
+								<div class="col-sm-9 form-control-static" data-bind="html: resultMessage(), css: resultError() ? 'text-danger':'text-success'"></div>
+							</div>
+						</div>
+
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-flat btn-success" data-bind="css: submitDisabled(), click: function(){ credit(); }, visible: status() == 'input' && myBalance() >= 0.01">
+							<i class="fa" data-bind="css: button.classLoading('fa-plus')"></i>
+							<?=$this->Lang->load('buttons,credit')?>
+						</button>
+						<button type="button" class="btn btn-flat btn-danger" data-bind="css: submitDisabled(), click: function(){ debit(); }, visible: status() == 'input' && agentBalance() >= 0.01">
+							<i class="fa" data-bind="css: button.classLoading('fa-minus')"></i>
+							<?=$this->Lang->load('buttons,debit')?>
+						</button>
+						<button type="button" class="btn btn-flat btn-primary" data-bind="css: submitDisabled(), click: function(){ save(); }, visible: status() == 'confirm'">
+							<i class="fa" data-bind="css: button.classLoading('fa-save')"></i>
+							<?=$this->Lang->load('buttons,confirm')?>
+						</button>
+						<button type="button" class="btn btn-flat btn-danger" data-bind="css: submitDisabled(), click: function(){ status('input'); mode('creditDebit'); }, visible: status() == 'confirm'">
+							<i class="fa" data-bind="css: button.classLoading('fa-undo')"></i>
+							<?=$this->Lang->load('buttons,back')?>
+						</button>
+						<button type="button" class="btn btn-flat btn-default" data-dismiss="modal" data-bind="css: button.classDisabled(), visible: status() != 'confirm'">
+							<i class="fa" data-bind="css: button.classLoading('fa-times')"></i>
+							<?=$this->Lang->load('buttons,close')?>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Agent Memo Modal -->
+		<div id="AgentsMemo" class="modal fade" data-bind="with: modalMemo">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<button type="button" class="close margin-right-10" data-bind="click: function(){ remove(); }, visible: !isEmpty(memoId())"><i class="fa fa-trash"></i></button>
+						<h4 class="modal-title"><?=$this->Lang->load('title,memo')?> (<span data-bind="html: agentCode()"></span>)</h4>
+					</div>
+					<div class="modal-body">
+						<textarea data-bind="textInput: memo" class="form-control" rows="10"></textarea>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-flat btn-primary" data-bind="css: button.classDisabled(), click: function(){ save(); }">
+							<i class="fa" data-bind="css: button.classLoading('fa-check')"></i>
+							<?=$this->Lang->load('buttons,apply')?>
+						</button>
+						<button type="button" class="btn btn-flat btn-default" data-dismiss="modal" data-bind="css: button.classDisabled()">
+							<i class="fa" data-bind="css: button.classLoading('fa-times')"></i>
+							<?=$this->Lang->load('buttons,close')?>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

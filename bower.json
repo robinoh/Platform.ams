@@ -1,0 +1,21 @@
+{
+  "name": "Platform.ams",
+  "version": "0.0.1",
+  "homepage": "https://github.com/pyloncloud/Platform.ams",
+  "authors": [
+    "Robin Oh <robin.oh@7even.com>"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4",
+    "bootstrap": "~3.3.6",
+    "font-awesome": "fontawesome#~4.5.0",
+    "knockout": "~3.4.0"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "src/ams/static/bower_components",
+    "test",
+    "tests"
+  ]
+}

@@ -1,0 +1,267 @@
+<div data-bind="stopBindings: false">
+	<div id="Players">
+		<div class="block-flat">
+			<div class="header">
+				<div class="search-box">
+					<div class="search-params">
+						<div class="form-inline">
+							<div class="input-group input-medium btn-checkbox">
+								<span class="input-group-addon"><i class="fa fa-fw pointer" data-bind="css: includeDownlines.cssCheck(), click: function(){ includeDownlines.toggle(); }"></i></span>
+								<button type="button" class="input-group-btn btn btn-medium btn-search2" style="margin: 0;" data-bind="css: includeDownlines.css(), click: function(){ includeDownlines.toggle(); }">
+									<span><?=$this->Lang->load('buttons,includeDownlines')?></span>
+								</button>
+							</div>
+							<div class="agentSearch"></div>
+							<div class="input-group input-medium">
+								<span class="input-group-addon"><i class="fa fa-bold fa-fw"></i></span>
+								<input type="text" class="form-control" data-bind="textInput: bonusCode, executeOnEnter: function(){ loadReset(); }" placeholder="<?=$this->Lang->load('placeholder,bonusCode')?>">
+							</div>
+							<div class="input-group input-medium">
+								<span class="input-group-addon"><i class="fa fa-dollar fa-fw"></i></span>
+								<input type="text" class="form-control disabled" readonly data-bind="textInput: depositRangeStart, executeOnEnter: function(){ loadReset(); }" placeholder="<?=$this->Lang->load('placeholder,depositRange')?>">
+							</div>
+						</div>
+						<div class="form-inline">
+							<div class="input-group input-medium">
+								<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
+								<input type="text" class="form-control" data-bind="textInput: usernameOrNickname, executeOnEnter: function(){ loadReset(); }" placeholder="<?=$this->Lang->load('placeholder,usernameNickname')?>">
+							</div>
+							<?if($userData['agentInfo']['hasPersonalInfoAccess']){?>
+							<div class="input-group input-medium">
+								<span class="input-group-addon"><i class="fa fa-envelope-o fa-fw"></i></span>
+								<input type="text" class="form-control" data-bind="textInput: emailAddress, executeOnEnter: function(){ loadReset(); }" placeholder="<?=$this->Lang->load('placeholder,email')?>">
+							</div>
+							<?}?>
+							<date-range params="dateFrom: signUpStartDate, dateTo: signUpEndDate, placeholder: window.lang.placeholder.signUpDate"></date-range>
+						</div>
+					</div>
+					<div class="search-buttons">
+						<div class="search-button">
+							<?if($userData['role'] == 'LABEL' || (array_key_exists('type', $userData['agentInfo']) && $userData['agentInfo']['type'] == 'Rakeback')){?>
+							<button type="button" class="btn btn-flat btn-warning btn-block hidden" id="btnPlayersRakeBack" data-bind="click: function(){ playersModal('rakeback'); }">
+								<i class="fa fa-pencil"></i>
+								<?=$this->Lang->load('buttons,rakeBackPercentage')?>
+							</button>
+							<?}?>
+							<?if($userData['agentInfo']['hasBalanceControlAccess']){?>
+							<button type="button" class="btn btn-flat btn-danger btn-block hidden" id="btnPlayersTransfer"  data-bind="click: function(){ playersModal('transfer'); }">
+								<i class="fa fa-dollar"></i>
+								<?=$this->Lang->load('buttons,creditDebit')?>
+							</button>
+							<?}?>
+						</div>
+						<div class="search-button wide-pull-right">
+							<button type="button" class="btn btn-flat btn-success btn-block btn2row" data-bind="click: function(){ loadReset(); }, css: DT.button.classDisabled()">
+								<i class="fa" data-bind="css: DT.button.classLoading('fa-search')"></i>
+								<?=$this->Lang->load('buttons,search')?>
+							</button>
+						</div>
+					</div>
+
+				</div>
+			</div>
+
+			<div class="content">
+				<div class="datatable-setting"></div>
+				<div data-bind="css: DT.isVisible() ? '' : 'table-scrollable'">
+					<table class="table-bordered dataTable" data-bind="DataTable: window.DTPreset.Players" id="playersTable">
+						<thead></thead>
+						<tbody></tbody>
+						<tfoot></tfoot>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<!-- Player Deposit History Modal -->
+		<div id="PlayersDepositHistory" class="modal fade" data-bind="with: depositHistoryView">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title"><?=$this->Lang->load('title,depositHistory')?></h4>
+					</div>
+					<div class="modal-body">
+						<table class="table-bordered dataTable" data-bind="DataTable: window.DTPreset.PlayersDepositHistory" id="depositHistoryTable">
+							<thead></thead>
+							<tbody></tbody>
+						</table>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-flat btn-default" data-dismiss="modal">
+							<i class="fa fa-times"></i>
+							<?=$this->Lang->load('buttons,close')?>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Player RakeBack Modal -->
+		<div id="PlayersRakebackModal" class="modal fade" data-bind="with: playersRakeback">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title"><?=$this->Lang->load('title,editRakeBack')?></h4>
+					</div>
+					<div class="modal-body">
+						<div class="alert alert-danger" data-bind="visible: error.visible()">
+							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+							<h4><?=$this->Lang->load('title,error')?></h4>
+							<p data-bind="html: error.text()"></p>
+						</div>
+
+						<table class="table-bordered dataTable">
+							<thead>
+							<tr>
+								<th><?=$this->Lang->load('columns,username')?></th>
+								<th><?=$this->Lang->load('columns,currentRakeback')?></th>
+								<th><?=$this->Lang->load('columns,newRakeback')?></th>
+								<!--ko if: step() == 2-->
+								<th><?=$this->Lang->load('columns,result')?></th>
+								<!--/ko-->
+							</tr>
+							</thead>
+							<tbody data-bind="foreach: rows">
+							<tr>
+								<td class="text-center" data-bind="html: username"></td>
+								<td class="right" data-bind="html: currentRakeback + '%'"></td>
+								<!--ko if: $parent.step() == 0-->
+								<td data-bind="css: newRakeback.ErrorClass()">
+									<input type="text" class="form-control input-sm text-right" data-bind="textInput: newRakeback" maxlength="3">
+								</td>
+								<!--/ko-->
+								<!--ko if: $parent.step() == 1 || $parent.step() == 2-->
+								<td class="right" data-bind="html: newRakeback() + '%'"></td>
+								<!--/ko-->
+								<!--ko if: $parent.step() == 2-->
+								<td data-bind="html: $parent.displayResult(code(), result())"></td>
+								<!--/ko-->
+							</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="modal-footer">
+						<p class="text-left" data-bind="visible: submitStatus(), html: submitErrorMsg()"></p>
+						<!--ko if: step() == 0-->
+						<button type="button" class="btn btn-flat btn-primary" data-bind="css: submitDisabled(), click: function(){ switchStep(1); }">
+							<i class="fa" data-bind="css: button.classLoading('fa-check')"></i>
+							<?=$this->Lang->load('buttons,apply')?>
+						</button>
+						<button type="button" class="btn btn-flat btn-default" data-dismiss="modal" data-bind="css: button.classDisabled()">
+							<i class="fa" data-bind="css: button.classLoading('fa-times')"></i>
+							<?=$this->Lang->load('buttons,close')?>
+						</button>
+						<!--/ko-->
+						<!--ko if: step() == 1-->
+						<button type="button" class="btn btn-flat btn-primary" data-bind="css: submitDisabled(), click: function(){ save(); }">
+							<i class="fa" data-bind="css: button.classLoading('fa-save')"></i>
+							<?=$this->Lang->load('buttons,confirm')?>
+						</button>
+						<button type="button" class="btn btn-flat btn-default" data-bind="css: button.classDisabled(), click: function(){ switchStep(0); }">
+							<i class="fa" data-bind="css: button.classLoading('fa-undo')"></i>
+							<?=$this->Lang->load('buttons,back')?>
+						</button>
+						<!--/ko-->
+						<!--ko if: step() == 2-->
+						<button type="button" class="btn btn-flat btn-default" data-dismiss="modal" data-bind="css: button.classDisabled()">
+							<i class="fa" data-bind="css: button.classLoading('fa-times')"></i>
+							<?=$this->Lang->load('buttons,close')?>
+						</button>
+						<!--/ko-->
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Player Transfer Modal -->
+		<div id="PlayersCreditDebitModal" class="modal fade" data-bind="with: transfer">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title"><?=$this->Lang->load('title,creditDebit')?></h4>
+					</div>
+					<div class="modal-body">
+						<div class="alert alert-danger" data-bind="visible: error.visible()">
+							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+							<h4><?=$this->Lang->load('title,error')?></h4>
+							<p data-bind="html: error.text()"></p>
+						</div>
+
+						<h4 class="tm0">
+							<?=$this->Lang->load('label,myBalance')?>
+							<span class="margin-left-10" data-bind="html: dataFormat(myBalance(), 'money')"></span>
+							<span data-bind="visible: step() < 2, html: expectedAmountDp()"></span>
+						</h4>
+
+						<table class="table-bordered dataTable">
+							<thead>
+							<tr>
+								<th><?=$this->Lang->load('columns,username')?></th>
+								<th><?=$this->Lang->load('columns,available')?></th>
+								<th><?=$this->Lang->load('columns,credit')?></th>
+								<th><?=$this->Lang->load('columns,debit')?></th>
+								<!--ko if: step() == 2-->
+								<th><?=$this->Lang->load('columns,result')?></th>
+								<!--/ko-->
+							</tr>
+							</thead>
+							<tbody data-bind="foreach: rows">
+							<tr>
+								<td class="text-center" data-bind="html: username"></td>
+								<td class="right" data-bind="html: balance()"></td>
+								<!--ko if: $parent.step() == 0-->
+								<td data-bind="css: credit.ErrorClass()">
+									<input type="text" class="form-control input-sm text-right" data-bind="textInput: credit, executeKeyup: function(){ if(!isEmpty(credit())) debit(''); }">
+								</td>
+								<td data-bind="css: debit.ErrorClass()">
+									<input type="text" class="form-control input-sm text-right" data-bind="textInput: debit, executeKeyup: function(){ if(!isEmpty(debit())) credit(''); }">
+								</td>
+								<!--/ko-->
+								<!--ko if: $parent.step() == 1 || $parent.step() == 2-->
+								<td class="right text-success" data-bind="html: (credit() == 0) ? '' : dataFormat(credit(), 'money')"></td>
+								<td class="right text-danger" data-bind="html: (debit() == 0) ? '' : dataFormat(debit(), 'money')"></td>
+								<!--/ko-->
+								<!--ko if: $parent.step() == 2-->
+								<td data-bind="html: $parent.displayResult(code(), result())"></td>
+								<!--/ko-->
+							</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="modal-footer">
+						<p class="text-left text-danger" data-bind="visible: submitStatus(), html: submitErrorMsg()"></p>
+						<!--ko if: step() == 0-->
+						<button type="button" class="btn btn-flat btn-primary" data-bind="css: submitDisabled(), click: function(){ switchStep(1); }">
+							<i class="fa" data-bind="css: button.classLoading('fa-check')"></i>
+							<?=$this->Lang->load('buttons,apply')?>
+						</button>
+						<button type="button" class="btn btn-flat btn-default" data-dismiss="modal" data-bind="css: button.classDisabled()">
+							<i class="fa" data-bind="css: button.classLoading('fa-times')"></i>
+							<?=$this->Lang->load('buttons,close')?>
+						</button>
+						<!--/ko-->
+						<!--ko if: step() == 1-->
+						<button type="button" class="btn btn-flat btn-primary" data-bind="css: submitDisabled(), click: function(){ save(); }">
+							<i class="fa" data-bind="css: button.classLoading('fa-save')"></i>
+							<?=$this->Lang->load('buttons,confirm')?>
+						</button>
+						<button type="button" class="btn btn-flat btn-default" data-bind="css: button.classDisabled(), click: function(){ switchStep(0); }">
+							<i class="fa" data-bind="css: button.classLoading('fa-undo')"></i>
+							<?=$this->Lang->load('buttons,back')?>
+						</button>
+						<!--/ko-->
+						<!--ko if: step() == 2-->
+						<button type="button" class="btn btn-flat btn-default" data-dismiss="modal" data-bind="css: button.classDisabled()">
+							<i class="fa" data-bind="css: button.classLoading('fa-times')"></i>
+							<?=$this->Lang->load('buttons,close')?>
+						</button>
+						<!--/ko-->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

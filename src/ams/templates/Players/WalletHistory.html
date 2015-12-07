@@ -1,0 +1,134 @@
+<div data-bind="stopBindings: false">
+	<div id="PlayersWalletHistory">
+		<div class="block-flat">
+			<div class="header">
+				<div class="search-box">
+					<div class="search-params">
+						<div class="form-inline">
+							<date-range params="dateFrom: startDate, dateTo: endDate, placeholder: window.lang.placeholder.time"></date-range>
+							<button type="button" class="btn btn-flat btn-success" data-bind="click: function(){ loadReset(); }, css: DT.button.classDisabled()">
+								<i class="fa" data-bind="css: DT.button.classLoading('fa-search')"></i>
+								<?=$this->Lang->load('buttons,search')?>
+							</button>
+							<button type="button" class="btn btn-flat btn-default" data-bind="css: filterCss(), click: function(){ filterToggle() }">
+								<i class="fa fa-filter"></i>
+								<?=$this->Lang->load('buttons,filter')?>
+							</button>
+						</div>
+						<div class="form-inline" data-bind="visible: isFilter()">
+							<div class="input-group vertical-top">
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<div class="checkbox btn-checkbox">
+											<label data-bind="click: function(){ transferToggleAll(); }, css: transferCssAll()">
+												<i class="fa"></i>
+												<span><?=$this->Lang->load('filter,transfer')?></span>
+											</label>
+										</div>
+									</div>
+									<div class="panel-body">
+										<div class="checkbox btn-checkbox" data-bind="foreach: window.walletType.transfer">
+											<label data-bind="click: function(){ $parent.transferToggle(code); }, css: $parent.transferCss(code)">
+												<i class="fa"></i>
+												<span data-bind="text: name"></span>
+											</label>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="input-group vertical-top">
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<div class="checkbox btn-checkbox">
+											<label data-bind="click: function(){ gamesToggleAll(); }, css: gamesCssAll()">
+												<i class="fa"></i>
+												<span><?=$this->Lang->load('filter,games')?></span>
+											</label>
+										</div>
+									</div>
+										<div class="panel-body">
+										<div class="checkbox btn-checkbox" data-bind="foreach: window.walletType.games">
+											<label data-bind="click: function(){ $parent.gameToggle(code); }, css: $parent.gamesCss(code)">
+												<i class="fa"></i>
+												<span data-bind="text: name"></span>
+											</label>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="input-group vertical-top">
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<div class="checkbox btn-checkbox">
+											<label data-bind="click: function(){ bonusToggleAll(); }, css: bonusCssAll()">
+												<i class="fa"></i>
+												<span><?=$this->Lang->load('filter,bonus')?></span>
+											</label>
+										</div>
+									</div>
+									<div class="panel-body">
+										<div class="checkbox btn-checkbox" data-bind="foreach: window.walletType.bonus">
+											<label data-bind="click: function(){ $parent.bonusToggle(code); }, css: $parent.bonusCss(code)">
+												<i class="fa"></i>
+												<span data-bind="text: name"></span>
+											</label>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="input-group vertical-top">
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<div class="checkbox btn-checkbox">
+											<label data-bind="click: function(){ casinoToggleAll(); }, css: casinoCssAll()">
+												<i class="fa"></i>
+												<span><?=$this->Lang->load('filter,casino')?></span>
+											</label>
+										</div>
+									</div>
+									<div class="panel-body">
+										<div class="checkbox btn-checkbox" data-bind="foreach: window.walletType.casino">
+											<label data-bind="click: function(){ $parent.casinoToggle(code); }, css: $parent.casinoCss(code)">
+												<i class="fa"></i>
+												<span data-bind="text: name"></span>
+											</label>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="input-group vertical-top">
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<div class="checkbox btn-checkbox">
+											<label data-bind="click: function(){ paymentToggleAll(); }, css: paymentCssAll()">
+												<i class="fa"></i>
+												<span><?=$this->Lang->load('filter,payment')?></span>
+											</label>
+										</div>
+									</div>
+									<div class="panel-body">
+										<div class="checkbox btn-checkbox" data-bind="foreach: window.walletType.payment">
+											<label data-bind="click: function(){ $parent.paymentToggle(code); }, css: $parent.paymentCss(code)">
+												<i class="fa"></i>
+												<span data-bind="text: name"></span>
+											</label>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="content">
+				<div class="datatable-setting"></div>
+				<table class="table-bordered dataTable" data-bind="DataTable: window.DTPreset.PlayersWalletHistory" id="playersWalletHistoryTable">
+					<thead></thead>
+					<tbody></tbody>
+					<tfoot></tfoot>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

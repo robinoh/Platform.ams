@@ -1,0 +1,59 @@
+<div data-bind="stopBindings: false">
+	<div id="BonusCodeTools">
+		<div class="block-flat">
+			<?if($userData['tier'] > 0){?>
+			<div class="header header-single">
+				<div class="search-box text-right">
+					<button type="button" class="btn btn-flat btn-danger" data-bind="css: DT.button.classDisabled(), click: function(){ create(); }">
+						<i class="fa fa-plus"></i>
+						<span><?=$this->Lang->load('buttons,createBonusCode')?></span>
+					</button>
+				</div>
+			</div>
+			<?}?>
+			<div class="content">
+				<table class="table-bordered dataTable" data-bind="DataTable: window.DTPreset.BonusCodeTools" id="BonusCodeToolsTable">
+					<thead></thead>
+					<tbody></tbody>
+				</table>
+			</div>
+		</div>
+
+		<div id="BonusCodeToolsModal" class="modal fade" data-bind="with: createModal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title"><?=$this->Lang->load('title,createBonusCode')?></h4>
+					</div>
+					<div class="modal-body">
+						<div class="alert alert-danger" data-bind="visible: error.visible()">
+							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+							<h4><?=$this->Lang->load('title,error')?></h4>
+							<p data-bind="html: error.text()"></p>
+						</div>
+						<div class="form-horizontal">
+							<div class="form-group" data-bind="css: bonusCode.ErrorClass()">
+								<label class="col-sm-3 control-label"><?=$this->Lang->load('label,bonusCode')?></label>
+								<div class="col-sm-9">
+									<input type="text" class="form-control input-sm" maxlength="20" data-bind="textInput: bonusCode">
+									<span class="help-block" data-bind="visible: bonusCode.hasError(), text: bonusCode.Message()"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-flat btn-primary" data-bind="css: submitDisabled(), click: function(){ save(); }">
+							<i class="fa" data-bind="css: button.classLoading('fa-save')"></i>
+							<?=$this->Lang->load('buttons,confirm')?>
+						</button>
+						<button type="button" class="btn btn-flat btn-default" data-dismiss="modal">
+							<i class="fa fa-times"></i>
+							<?=$this->Lang->load('buttons,close')?>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

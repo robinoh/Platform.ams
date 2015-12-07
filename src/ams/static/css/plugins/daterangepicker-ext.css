@@ -1,0 +1,20 @@
+date-range{
+	display: inline-block;
+}
+
+date-range .input-group-addon{
+	background: #fff;
+	cursor: pointer;
+}
+
+.daterangepicker .ranges li{
+	margin-bottom: 4px;
+}
+.daterangepicker .apply-buttons{
+	right: 8px;
+	bottom: 8px;
+	display: none;
+}
+.daterangepicker .ranges .input-mini{
+	margin: 0;
+}

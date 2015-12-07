@@ -1,0 +1,250 @@
+<div data-bind="stopBindings: false">
+	<div id="MyInfo">
+		<div class="block-flat">
+			<div class="header header-single">
+				<div class="search-box">
+					<div class="search-params">
+						<div class="form-inline">
+							<date-range params="dateFrom: dateFrom, dateTo: dateTo, selectedCustom: 7"></date-range>
+							<button type="button" class="btn btn-flat btn-success btn-search" data-bind="click: function(){ loadReset(); }, css: DT.button.classDisabled()">
+								<i class="fa" data-bind="css: DT.button.classLoading('fa-search')"></i>
+								<?=$this->Lang->load('buttons,search')?>
+							</button>
+						</div>
+					</div>
+					<div class="myBalance-box text-right">
+						<span class="myBalance margin-right-10">
+							<a data-bind="click: function(){ getMyBalance(); }"><i class="fa fa-fw" data-bind="css: button.classLoading('fa-repeat')"></i></a>
+							<strong><?=$this->Lang->load('label,myBalance')?> : <span data-bind="html: dataFormat(myBalance(), 'money')"></span></strong>
+						</span>
+						<button type="button" class="btn btn-flat btn-primary" data-bind="click: function(){ getMyBalance(true) }, css: requestWithdrawalClassDisabled()">
+							<i class="fa fa-fw" data-bind="css: requestWithdrawalClassLoading()"></i>
+							<?=$this->Lang->load('buttons,requestWithdrawal')?>
+						</button>
+						<a class="myBalanceQ margin-left-10" data-bind="click: function(){ $('.myBalanceA').toggle(); }"><i class="fa fa-question-circle"></i></a>
+						<div class="myBalanceA popover bottom">
+							<div class="arrow"></div>
+							<div class="popover-title">
+								<i class="fa fa-info-circle fa-fw"></i>
+								<?=$this->Lang->load('buttons,requestWithdrawal')?>
+								<a class="pull-right" data-bind="click: function(){ $('.myBalanceA').hide(); }">&times;</a>
+							</div>
+							<div class="popover-content"><?=$this->Lang->load('string,requestWithdrawalDesc')?></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="content">
+				<div class="datatable-setting"></div>
+				<div data-bind="css: DT.isVisible() ? '' : 'table-scrollable'">
+					<table class="table-bordered dataTable" data-bind="DataTable: window.DTPreset.MyInfo" id="myInfoTable">
+						<thead></thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<div id="MyInfoDetail" class="modal fade" data-bind="with: detailView">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title" data-bind="html: title()"></h4>
+					</div>
+					<div class="modal-body">
+						<!--ko if: mode() == 'commission'-->
+						<table class="table-bordered dataTable">
+							<thead>
+							<tr>
+								<th><?=$this->Lang->load('columns,ggr')?></th>
+								<th><?=$this->Lang->load('columns,deduction')?></th>
+								<th><?=$this->Lang->load('columns,commission')?></th>
+							</tr>
+							</thead>
+							<tbody data-bind="foreach: detail">
+							<tr>
+								<td class="text-right" data-bind="html: isEmpty(ggr) ? '' : dataFormat(ggr, 'money')"></td>
+								<td class="text-right" data-bind="html: dataFormat(deduction, 'money')"></td>
+								<td class="text-right" data-bind="html: dataFormat(commission, 'money')"></td>
+							</tr>
+							</tbody>
+						</table>
+						<!--/ko-->
+						<!--ko if: mode() == 'subcommission'-->
+						<table class="table-bordered dataTable">
+							<thead>
+							<tr>
+								<th><?=$this->Lang->load('columns,agent')?></th>
+								<th><?=$this->Lang->load('columns,ngr')?></th>
+								<th><?=$this->Lang->load('columns,commissionPercentage')?></th>
+								<th><?=$this->Lang->load('columns,subCommission')?></th>
+							</tr>
+							</thead>
+							<tbody data-bind="foreach: detail">
+							<tr>
+								<td class="text-left" data-bind="html: agent"></td>
+								<td class="text-right" data-bind="html: dataFormat(ngr, 'money')"></td>
+								<td class="text-center" data-bind="html: commissionPercent + '%'"></td>
+								<td class="text-right" data-bind="html: dataFormat(subCommission, 'money')"></td>
+							</tr>
+							</tbody>
+						</table>
+						<!--/ko-->
+						<!--ko if: mode() == 'rakeback'-->
+						<table class="table-bordered dataTable" data-bind="DataTable: window.DTPreset.MyInfoRakebackView" id="rakeBackTable">
+							<thead></thead>
+							<tbody></tbody>
+						</table>
+						<!--/ko-->
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-flat btn-default" data-dismiss="modal">
+							<i class="fa fa-times"></i>
+							<?=$this->Lang->load('buttons,close')?>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="MyInfoRequestWithdrawal" class="modal fade" data-bind="with: requestWithdrawal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title"><?=$this->Lang->load('title,requestWithdrawal')?></h4>
+					</div>
+					<div class="modal-body" data-bind="visible: !succeeded()">
+						<div class="alert alert-danger" data-bind="visible: error.visible()">
+							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+							<h4><?=$this->Lang->load('title,error')?></h4>
+							<p data-bind="html: error.text()"></p>
+						</div>
+						<ul class="nav nav-tabs" data-bind="foreach: pspList">
+							<li data-bind="click: function(){ $parent.setPsp(code) }, css: $parent.pspClass(code)"><a data-bind="html: name"></a></li>
+						</ul>
+						<div class="tab-content">
+							<div class="form-horizontal">
+								<div class="form-group text-bigger">
+									<label class="col-sm-4 control-label"><?=$this->Lang->load('label,myBalance')?></label>
+									<div class="col-sm-8 form-control-static myBalance-box2">
+										<a data-bind="click: function(){ parent.getMyBalance(); }"><i class="fa" data-bind="css: parent.button.classLoading('fa-repeat')"></i></a>
+										<strong data-bind="html: expectedResult()"></strong>
+										<a class="myBalanceQ2" data-bind="event: { mouseover: function(){ $('.myBalanceA2').show(); }, mouseout: function(){ $('.myBalanceA2').hide(); } }, mouseoverBubble: false"><i class="fa fa-question-circle"></i></a>
+										<div class="myBalanceA2 popover bottom">
+											<div class="arrow"></div>
+											<div class="popover-content">
+												- <?=$this->Lang->load('buttons,min')?> : <span data-bind="html: dataFormat(amount.minValue(), 'money')"></span><br>
+												- <?=$this->Lang->load('buttons,max')?> : <span data-bind="html: dataFormat(amount.maxValue(), 'money')"></span> = <small><span data-bind="html: dataFormat(parent.myBalance(), 'money')"></span> * 90%</small><br>
+												* <?=$this->Lang->load('string,requestAmountInfo')?>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group" data-bind="css: amount.ErrorClass()">
+									<label class="col-sm-4 control-label"><?=$this->Lang->load('label,requestAmount')?></label>
+									<div class="col-sm-8">
+										<div class="input-group input-group-sm no-margin-bottom">
+											<div class="input-group-addon">$</div>
+											<input type="text" id="amountInput" class="form-control input-sm text-right" data-bind="textInput: amount, attr: { placeholder: amountPlaceholder() }, executeFocusOut: function(){ visibleAmountView(true); }, visible: !visibleAmountView()"">
+											<input type="text" class="form-control input-sm text-right" data-bind="textInput: amountView, attr: { placeholder: amountPlaceholder() }, executeFocusIn: function(){ visibleAmountView(false); $('#amountInput').trigger('focus'); }, visible: visibleAmountView()">
+											<div class="input-group-btn">
+												<button type="button" class="btn btn-flat btn-default btn-sm btn-w50" data-bind="click: function(){ setAmount('min'); }"><?=$this->Lang->load('buttons,min')?></button>
+												<button type="button" class="btn btn-flat btn-default btn-sm btn-w50" data-bind="click: function(){ setAmount('max'); }"><?=$this->Lang->load('buttons,max')?></button>
+											</div>
+										</div>
+										<span class="help-block no-margin-bottom" data-bind="visible: amount.Status(), html: amount.Message()"></span>
+									</div>
+								</div>
+								<div class="form-group" data-bind="visible: !isBank(), css: pspId.ErrorClass()">
+									<label class="col-sm-4 control-label"><?=$this->Lang->load('label,id')?></label>
+									<div class="col-sm-8">
+										<input type="text" class="form-control input-sm no-margin-bottom" data-bind="textInput: pspId, attr: { placeholder: window.lang['placeholder']['required'] }, css: cssEmpty(pspId())" maxlength="100">
+									</div>
+								</div>
+								<div class="form-group" data-bind="visible: isBank(), css: bankName.ErrorClass()">
+									<label class="col-sm-4 control-label"><?=$this->Lang->load('label,bankName')?></label>
+									<div class="col-sm-8">
+										<input type="text" class="form-control input-sm no-margin-bottom" data-bind="textInput: bankName, attr: { placeholder: window.lang['placeholder']['required'] }, css: cssEmpty(bankName())" maxlength="250">
+									</div>
+								</div>
+								<div class="form-group" data-bind="visible: isBank(), css: bankAddress.ErrorClass()">
+									<label class="col-sm-4 control-label"><?=$this->Lang->load('label,bankAddress')?></label>
+									<div class="col-sm-8">
+										<input type="text" class="form-control input-sm no-margin-bottom" data-bind="textInput: bankAddress, attr: { placeholder: window.lang['placeholder']['required'] }, css: cssEmpty(bankAddress())" maxlength="250">
+									</div>
+								</div>
+								<div class="form-group" data-bind="visible: isBank(), css: accountName.ErrorClass()">
+									<label class="col-sm-4 control-label"><?=$this->Lang->load('label,accountName')?></label>
+									<div class="col-sm-8">
+										<input type="text" class="form-control input-sm no-margin-bottom" data-bind="textInput: accountName, attr: { placeholder: window.lang['placeholder']['required'] }, css: cssEmpty(accountName())" maxlength="250">
+									</div>
+								</div>
+								<div class="form-group" data-bind="visible: isBank(), css: accountNumber.ErrorClass()">
+									<label class="col-sm-4 control-label"><?=$this->Lang->load('label,accountNumber')?></label>
+									<div class="col-sm-8">
+										<input type="text" class="form-control input-sm no-margin-bottom" data-bind="textInput: accountNumber, attr: { placeholder: window.lang['placeholder']['required'] }, css: cssEmpty(accountNumber())" maxlength="250">
+									</div>
+								</div>
+								<div class="form-group" data-bind="visible: isBank(), css: swiftCode.ErrorClass()">
+									<label class="col-sm-4 control-label"><?=$this->Lang->load('label,swiftCode')?></label>
+									<div class="col-sm-8">
+										<input type="text" class="form-control input-sm no-margin-bottom" data-bind="textInput: swiftCode, attr: { placeholder: window.lang['placeholder']['required'] }, css: cssEmpty(swiftCode())" maxlength="250">
+									</div>
+								</div>
+								<div class="form-group" data-bind="visible: isBank()">
+									<label class="col-sm-4 control-label"><?=$this->Lang->load('label,ibanEurope')?></label>
+									<div class="col-sm-8">
+										<input type="text" class="form-control input-sm no-margin-bottom" data-bind="textInput: iban, attr: { placeholder: window.lang['placeholder']['optional'] }, css: cssEmpty(iban())" maxlength="250">
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-4 control-label"><?=$this->Lang->load('label,comment')?></label>
+									<div class="col-sm-8">
+										<textarea class="form-control" data-bind="textInput: comment, attr: { placeholder: window.lang['placeholder']['optional'] }" rows="3" maxlength="250"></textarea>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer" data-bind="visible: !succeeded()">
+						<div class="row">
+							<div class="col-sm-6 requestWithdrawalEmail">
+								<i class="fa fa-exclamation-triangle"></i>
+								<p class="text-left" data-bind="html: requestWithdrawalEmail"></p>
+							</div>
+							<div class="col-sm-6 font0">
+								<button type="button" class="btn btn-sm btn-flat btn-danger" data-bind="click: function(){ reset(); }, css: button.classDisabled()">
+									<i class="fa" data-bind="css: button.classLoading('fa-refresh')"></i>
+									<?=$this->Lang->load('buttons,reset')?>
+								</button>
+								<button type="button" class="btn btn-sm btn-flat btn-primary" data-bind="click: function(){ save(); }, css: button.classDisabled()">
+									<i class="fa" data-bind="css: button.classLoading('fa-save')"></i>
+									<?=$this->Lang->load('buttons,save')?>
+								</button>
+								<button type="button" class="btn btn-sm btn-flat btn-success" data-bind="click: function(){ submit(); }, css: submitDisabled()">
+									<i class="fa" data-bind="css: button.classLoading('fa-send')"></i>
+									<?=$this->Lang->load('buttons,submit')?>
+								</button>
+							</div>
+						</div>
+					</div>
+					<div class="modal-body" data-bind="visible: succeeded()">
+						<div class="alert alert-success">
+							<p class="margin-left-10 margin-right-10 text-bigger"><?=$this->Lang->load('string,requestWithdrawalResult')?></p>
+							<p class="margin-left-10 margin-right-10 margin-top-10"><i class="fa fa-exclamation-triangle text-bigger"></i> <span data-bind="html: requestWithdrawalEmail"></span></p>
+						</div>
+					</div>
+					<div class="modal-footer" data-bind="visible: succeeded()">
+						<button type="button" class="btn btn-sm btn-flat btn-default" data-dismiss="modal">
+							<i class="fa fa-times"></i>
+							<?=$this->Lang->load('buttons,close')?>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
